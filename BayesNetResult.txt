@@ -1,0 +1,107 @@
+=== Run information ===
+
+Scheme:       weka.classifiers.bayes.BayesNet -D -Q weka.classifiers.bayes.net.search.local.K2 -- -P 1 -S BAYES -E weka.classifiers.bayes.net.estimate.SimpleEstimator -- -A 0.5
+Relation:     reHospital-weka.filters.unsupervised.attribute.Remove-R1
+Instances:    32698
+Attributes:   14
+              GENDER
+              AGE
+              BLOOD
+              BLOOD_RH
+              EDUCATION
+              OCCUPATION
+              MARRIAGE
+              num0	//住院次数
+              num1	//住院总花费
+              num2	//住院药品种类(允许重复)
+              num3	//门诊次数
+              num4	//门诊总花费
+              num5	//门诊药品种类(允许重复)
+              Group
+Test mode:    10-fold cross-validation
+
+=== Classifier model (full training set) ===
+
+Bayes Network Classifier
+not using ADTree
+#attributes=14 #classindex=13
+Network structure (nodes followed by parents)
+GENDER(3): Group 
+AGE(2): Group 
+BLOOD(5): Group 
+BLOOD_RH(3): Group 
+EDUCATION(6): Group 
+OCCUPATION(11): Group 
+MARRIAGE(5): Group 
+num0(3): Group 
+num1(3): Group 
+num2(2): Group 
+num3(3): Group 
+num4(3): Group 
+num5(3): Group 
+Group(2): 
+LogScore Bayes: -279228.250150394
+LogScore BDeu: -279386.82351537404
+LogScore MDL: -279466.80154579575
+LogScore ENTROPY: -279056.1963126747
+LogScore AIC: -279135.1963126747
+
+
+Time taken to build model: 0.09 seconds
+
+=== Stratified cross-validation ===
+=== Summary ===
+
+Correctly Classified Instances       31707               96.9692 %
+Incorrectly Classified Instances       991                3.0308 %
+Kappa statistic                          0.1069
+Mean absolute error                      0.0471
+Root mean squared error                  0.1622
+Relative absolute error                128.4332 %
+Root relative squared error            119.8973 %
+Total Number of Instances            32698     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.986    0.887    0.983      0.986    0.985      0.107    0.679     0.989     0
+                 0.113    0.014    0.133      0.113    0.122      0.107    0.679     0.073     1
+Weighted Avg.    0.970    0.871    0.967      0.970    0.968      0.107    0.679     0.972     
+
+=== Confusion Matrix ===
+
+     a     b   <-- classified as
+ 31638   450 |     a = 0
+   541    69 |     b = 1
+
+
+=== Re-evaluation on test set ===
+
+User supplied test set
+Relation:     reHospital
+Instances:     unknown (yet). Reading incrementally
+Attributes:   15
+
+=== Summary ===
+
+Correctly Classified Instances       31349               95.8744 %
+Incorrectly Classified Instances      1349                4.1256 %
+Kappa statistic                          0.142 
+Mean absolute error                      0.0462
+Root mean squared error                  0.1777
+Total Number of Instances            32698     
+
+=== Detailed Accuracy By Class ===
+
+                 TP Rate  FP Rate  Precision  Recall   F-Measure  MCC      ROC Area  PRC Area  Class
+                 0.972    0.780    0.985      0.972    0.979      0.148    0.756     0.992     0
+                 0.220    0.028    0.128      0.220    0.162      0.148    0.756     0.099     1
+Weighted Avg.    0.959    0.766    0.970      0.959    0.964      0.148    0.756     0.976     
+
+=== Confusion Matrix ===
+
+     a     b   <-- classified as
+ 31219   889 |     a = 0
+   460   130 |     b = 1
+
+
