@@ -1,21 +1,23 @@
 package com.company;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
-import org.apache.commons.io.FileUtils;
+
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
-import net.sf.json.*;
+
 
 
 public class Main {
 
     public static  void main(String[] args) {
-        PrepareArffHead("2011-2013train.txt");
-        PrepareArffHead("2011-2014test.txt");
+        PrepareArffHead("2011-2013train.arff");
+        PrepareArffHead("2011-2014test.arff");
         ParseJson();
     }
     public static JsonArray AnalysisBigJson(String content){
@@ -36,10 +38,14 @@ public class Main {
             out.write("@attribute EDUCATION {1,2,3,4,5,6}\r\n");
             out.write("@attribute OCCUPATION {1,2,3,4,5,6,7,8,9,10,11}\r\n");
             out.write("@attribute MARRIAGE {1,2,3,4,5}\r\n");
-            for(int i=0;i<6;i++){
-                out.write("@attribute num"+i+" real\r\n");
-            }
-            out.write("@attribute Group {T,F}\r\n");
+            out.write("@attribute HosTimes real\r\n");
+            out.write("@attribute HosFees real\r\n");
+            out.write("@attribute HosMedicine real\r\n");
+            out.write("@attribute OutTimes real\r\n");
+            out.write("@attribute OutFees real\r\n");
+            out.write("@attribute OutMedicine real\r\n");
+            out.write("@attribute MaxTimes real\r\n");
+            out.write("@attribute Group {0,1}\r\n");
             out.write("@data\r\n");
             out.close();
         }catch (IOException ioe){
@@ -75,13 +81,13 @@ public class Main {
         BufferedWriter testOut=null;
 
         try{
-            trainOut=new BufferedWriter(new FileWriter("2011-2013train.txt",true));
+            trainOut=new BufferedWriter(new FileWriter("2011-2013train.arff",true));
         }catch(IOException ioe){
-            System.err.println("Failed to open 2011-2013train.txt");
+            System.err.println("Failed to open 2011-2013train.arff");
         }
 
         try {
-            testOut=new BufferedWriter(new FileWriter("2011-2014test.txt",true));
+            testOut=new BufferedWriter(new FileWriter("2011-2014test.arff",true));
         }catch (IOException ioe){
             System.err.println("Failed to open 2013-2014test.txt");
         }
@@ -162,10 +168,11 @@ public class Main {
             }
 
 
-
             JSONObject history=jsonObject.getJSONObject("history");
             JSONArray out=history.getJSONArray("out");
             JSONArray hos=history.getJSONArray("hos");
+            Map<String, Integer> testCounter = new HashMap<String, Integer>();
+            Map<String, Integer> trainCounter = new HashMap<String, Integer>();
 
             int hosTimesTrain=0;
             int hosTimesTest=0;
@@ -186,6 +193,9 @@ public class Main {
             int outMedicineTrain=0;
             int outMedicineTest=0;
 
+            int TestCodeTimes=0;
+            int TrainCodeTimes=0;
+
             boolean TestRehos=false;
             boolean TrainRehos=false;
 
@@ -201,11 +211,24 @@ public class Main {
                     outFeeSumTest+=curVisit.getDouble("FEE");
                     outMedicineTrain+=curVisit.getJSONArray("MEDICINE").size();
                     outMedicineTest+=curVisit.getJSONArray("MEDICINE").size();
+                    if(testCounter.containsKey(curVisit.getString("ICD_CODE")))
+                        testCounter.put(curVisit.getString("ICD_CODE"),testCounter.get(curVisit.getString("ICD_CODE"))+1);
+                    else
+                        testCounter.put(curVisit.getString("ICD_CODE"),1);
+
+                    if(trainCounter.containsKey(curVisit.getString("ICD_CODE")))
+                        trainCounter.put(curVisit.getString("ICD_CODE"),trainCounter.get(curVisit.getString("ICD_CODE"))+1);
+                    else
+                        trainCounter.put(curVisit.getString("ICD_CODE"),1);
                 }
                 if(timePeriod==1){
                     outTimesTest++;
                     outFeeSumTest+=curVisit.getDouble("FEE");
                     outMedicineTest+=curVisit.getJSONArray("MEDICINE").size();
+                    if(testCounter.containsKey(curVisit.getString("ICD_CODE")))
+                        testCounter.put(curVisit.getString("ICD_CODE"),testCounter.get(curVisit.getString("ICD_CODE"))+1);
+                    else
+                        testCounter.put(curVisit.getString("ICD_CODE"),1);
                 }
             }
 
@@ -219,16 +242,38 @@ public class Main {
                     hosFeeSumTest+=curVisit.getDouble("FEE");
                     hosMedicineTrain+=curVisit.getJSONArray("MEDICINE").size();
                     hosMedicineTest+=curVisit.getJSONArray("MEDICINE").size();
+                    if(testCounter.containsKey(curVisit.getString("ICD_CODE")))
+                        testCounter.put(curVisit.getString("ICD_CODE"),testCounter.get(curVisit.getString("ICD_CODE"))+1);
+                    else
+                        testCounter.put(curVisit.getString("ICD_CODE"),1);
+
+                    if(trainCounter.containsKey(curVisit.getString("ICD_CODE")))
+                        trainCounter.put(curVisit.getString("ICD_CODE"),trainCounter.get(curVisit.getString("ICD_CODE"))+1);
+                    else
+                        trainCounter.put(curVisit.getString("ICD_CODE"),1);
                 }
                 if(timePeriod==1){
                     TrainRehos=true;
                     hosTimesTest++;
                     hosFeeSumTest+=curVisit.getDouble("FEE");
                     hosMedicineTest+=curVisit.getJSONArray("MEDICINE").size();
+                    if(testCounter.containsKey(curVisit.getString("ICD_CODE")))
+                        testCounter.put(curVisit.getString("ICD_CODE"),testCounter.get(curVisit.getString("ICD_CODE"))+1);
+                    else
+                        testCounter.put(curVisit.getString("ICD_CODE"),1);
                 }
                 if(timePeriod==2){
                     TestRehos=true;
                 }
+            }
+
+            for(Map.Entry<String,Integer>entry:testCounter.entrySet()){
+                if(entry.getValue()>TestCodeTimes)
+                    TestCodeTimes=entry.getValue();
+            }
+            for(Map.Entry<String,Integer>entry:trainCounter.entrySet()){
+                if(entry.getValue()>TrainCodeTimes)
+                    TrainCodeTimes=entry.getValue();
             }
 
             try {
@@ -244,10 +289,13 @@ public class Main {
                 trainOut.write(",");
                 trainOut.write(""+outMedicineTrain);
                 trainOut.write(",");
+                trainOut.write(""+TrainCodeTimes);
+                trainOut.write(",");
                 if(TrainRehos)
-                    trainOut.write("T");
+                    trainOut.write("1");
                 else
-                    trainOut.write("F");
+                    trainOut.write("0");
+                trainOut.write("\r\n");
             }catch (IOException ioe){
                 System.out.println("failed to write to train set");
             }
@@ -265,20 +313,17 @@ public class Main {
                 testOut.write(",");
                 testOut.write(""+outMedicineTest);
                 testOut.write(",");
+                testOut.write(""+TestCodeTimes);
+                testOut.write(",");
                 if(TestRehos)
-                    testOut.write("T");
+                    testOut.write("1");
                 else
-                    testOut.write("F");
+                    testOut.write("0");
+                testOut.write("\r\n");
             }catch (IOException ioe){
                 System.out.println("failed to write to test set");
             }
-            try {
 
-                trainOut.write("\r\n");
-                testOut.write("\r\n");
-            }catch (IOException ioe){
-                System.out.println("failed to write ");
-            }
         }
 
         try {
